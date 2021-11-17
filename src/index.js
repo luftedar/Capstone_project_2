@@ -88,7 +88,7 @@ const showComments = async (id) => {
 const popUpHtml = (target) => {
   comments.innerHTML = `
     <div id='pop'>
-      <i class='fa fa-time'></i>
+      <i class='fas fa-times'></i>
       <img src="${movies[parseInt(target) - 1].image.medium}" alt="${movies[parseInt(target) - 1].name}">
       <h1>${movies[parseInt(target) - 1].name}</h1>
       <div id='comment-feature'>
@@ -117,5 +117,8 @@ body.addEventListener('click', (e) => {
     comments.innerHTML = '';
     popUpHtml(e.target.name);
     postNewComments(sentID,sentUserName,sentUserComment);
+  }else if (e.target.classList.contains('fa-times')) {
+    comments.innerHTML = '';
+    displayMovie();
   }
 });
