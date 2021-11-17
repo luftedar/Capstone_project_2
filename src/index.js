@@ -5,6 +5,7 @@ const comments = document.querySelector('.comments');
 const body = document.querySelector('body');
 let movies = [];
 let commentHTML = '';
+let getCommentsFromAPI = [];
 
 const getMovies = async () => {
  const result = await axios.get('https://api.tvmaze.com/shows');
@@ -14,7 +15,6 @@ const getMovies = async () => {
 };
 
 const updateLikes = async (ele) => {
-  console.log(ele);
   await axios.post(`https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/likes`,{ item_id: ele.id});
   displayMovie();
 }
@@ -46,18 +46,13 @@ const displayMovie = async() => {
 
 displayMovie();
 
-const postNewComments = (movieID='movie1', userName='Orcun', userComment='Trying') => {
-  axios.post(`https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/comments`, {
-    item_id: movieID,
-    username: userName,
-    comment: userComment
-  })
-}
-
-const renderItemsComments = async () => {
-  const getCommentsFromAPI = await getComments('movie1');
-  getCommentsFromAPI.forEach((i) => {commentHTML += `<p>${i.creation_date} ${i.username}: ${i.comment}</p>`})
-  console.log(commentHTML);
+const postNewComments = async (movieID, userName, userComment) => {
+  await axios.post(`https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/comments`, {
+    "item_id": movieID,
+    "username": userName,
+    "comment": userComment
+  });
+  showComments(movieID);
 }
 
 const getComments = async (movieId) => {
@@ -65,7 +60,19 @@ const getComments = async (movieId) => {
   return comments.data;
 }
 
-const showComments = () => {
+const showComments = async (id) => {
+  console.log(id);
+  try{ getCommentsFromAPI = await getComments(id)}catch{
+    popUpHtml(id);
+    commentHTML = '<p>No Comments Yet</p>'
+    getCommentsFromAPI = [];
+  };
+  console.log(getCommentsFromAPI.length);
+  if(getCommentsFromAPI.length === 0){
+    commentHTML = '<p>No Comments Yet</p>';
+  }else {
+    getCommentsFromAPI.forEach((i) => { commentHTML += `<p>${i.creation_date} ${i.username}: ${i.comment}</p>` });
+  }
   comments.innerHTML +=
   `<div id='comment-area'>
         <h2>Comments</h2>
@@ -76,13 +83,38 @@ const showComments = () => {
         <form action="submit" id="form-area">
           <input type="text" id="name" placeholder="Your Name">
           <textarea type="textarea" rows="4" cols="50" name="comment">Your Insights</textarea>
-          <button id="form-submit" type="button">Submit Comment</button>
+          <button id="${id}" type="button">Submit Comment</button>
         </form>
       </div>`;
 }
 
+const popUpHtml = (target) => {
+  comments.innerHTML = `
+    <div id='pop'>
+      <img src="${movies[parseInt(target) - 1].image.medium}" alt="${movies[parseInt(target) - 1].name}">
+      <h1>${movies[parseInt(target) - 1].name}</h1>
+      <div id='comment-feature'>
+        <p> Rating: ${movies[parseInt(target) - 1].rating.average}</p>
+        <p> Released Date: ${movies[parseInt(target) - 1].premiered}</p>
+        <p> Genres: ${movies[parseInt(target) - 1].genres}</p>
+        <p> Language: ${movies[parseInt(target) - 1].language}</p>
+      </div>
+    </div>`;
+}
+
 body.addEventListener('click', (e) => {
+  let indexID = e.target.parentNode.id 
   if (e.target.className === 'comment-button') {
+    popUpHtml(e.target.parentNode.id);
+    commentHTML = '';
+    showComments(indexID);
+  }
+  else if (e.target.classList.contains('fa-heart')) {
+    updateLikes(e.target)
+  }else if (e.target.type === 'button'){
+    let sentID = (e.target.id).toString();
+    let sentUserName = (e.target.parentNode.childNodes[1].value);
+    let sentUserComment = (e.target.parentNode.childNodes[3].value);
     comments.innerHTML = `
     <div id='pop'>
       <img src="${movies[parseInt(e.target.parentNode.id) - 1].image.medium}" alt="${movies[parseInt(e.target.parentNode.id) - 1].name}">
@@ -94,9 +126,6 @@ body.addEventListener('click', (e) => {
         <p> Language: ${movies[parseInt(e.target.parentNode.id) - 1].language}</p>
       </div>
     </div>`;
-    showComments();
-  }
-  else if (e.target.classList.contains('fa-heart')) {
-    updateLikes(e.target)
+    postNewComments(sentID,sentUserName,sentUserComment);
   }
 });
