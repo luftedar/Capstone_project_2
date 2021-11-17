@@ -3,32 +3,47 @@ import axios from 'axios';
 const div = document.querySelector('.movies');
 const comments = document.querySelector('.comments');
 const body = document.querySelector('body');
-const movies = [];
+let movies = [];
 
-const render = (movie) => {
-  div.innerHTML += `
-  <div id="${movie.id}">
-  <img src="${movie.image.medium}" alt="${movie.name}">
-  <p>${movie.name}</p>
-  <button><i class="far fa-heart"></i></button>
-  <button class="comment-button">Comment</button>
-  </div>`;
+const getMovies = async () => {
+ const result = await axios.get('https://api.tvmaze.com/shows');
+ movies = result.data;
+ movies = movies.slice(0,6);
+ return movies;
 };
 
-const getData = async () => {
-  const movies = await axios.get('https://api.tvmaze.com/shows?limit=5');
-  movies.data.forEach((movie, index) => {
-    if (index < 6) {
-      render(movie);
-    }
-  });
-};
+const updateLikes = async (ele) => {
+  console.log(ele);
+  await axios.post(`https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/likes`,{ item_id: ele.id});
+  displayMovie();
+}
 
-const renderComments = () => {
-  axios.get('https://api.tvmaze.com/shows?limit=5')
-    .then((res) => res.data)
-    .then((dev) => movies.push(...dev.slice(0, 6)));
-};
+const GetLikes = async () => { 
+  const res = await axios.get(`https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/likes/`);
+  return res.data;
+}
+
+const displayMovie = async() => {
+ const movies = await getMovies();
+  const likes =await GetLikes();
+  div.innerHTML = '';
+  movies.forEach((movie, index) => {
+    let likeVal = likes[index] !== undefined ? likes[index].likes : 0;
+    div.innerHTML += `
+    <div id="${movie.id}">
+    <img src="${movie.image.medium}" alt="${movie.name}">
+    <p>${movie.name}</p>
+    <div>
+    <button><i class="far fa-heart" id='heart-${movie.id}'></i></button>
+    <p>${likeVal} likes</p>
+    </div>
+    <button class="comment-button">Comment</button>
+    </div>`;
+
+  })
+}
+
+displayMovie();
 
 body.addEventListener('click', (e) => {
   if (e.target.className === 'comment-button') {
@@ -44,7 +59,7 @@ body.addEventListener('click', (e) => {
       </div>
     </div>`;
   }
+  else if (e.target.classList.contains('fa-heart')) {
+    updateLikes(e.target)
+  }
 });
-
-renderComments();
-getData();
