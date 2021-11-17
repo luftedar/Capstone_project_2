@@ -6,16 +6,6 @@ const body = document.querySelector('body');
 let movies = [];
 let commentHTML = '';
 
-const render = (movie) => {
-  div.innerHTML += `
-  <div id="${movie.id}">
-  <img src="${movie.image.medium}" alt="${movie.name}">
-  <p>${movie.name}</p>
-  <button><i class="far fa-heart"></i></button>
-  <button class="comment-button">Comment</button>
-  </div>`;
-};
-
 const getMovies = async () => {
  const result = await axios.get('https://api.tvmaze.com/shows');
  movies = result.data;
@@ -108,5 +98,3 @@ body.addEventListener('click', (e) => {
 
 renderItemsComments();
 postNewComments()
-renderComments();
-getData();
