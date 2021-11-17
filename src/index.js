@@ -6,7 +6,6 @@ const body = document.querySelector('body');
 let movies = [];
 let commentHTML = '';
 
-
 const getMovies = async () => {
  const result = await axios.get('https://api.tvmaze.com/shows');
  movies = result.data;
@@ -96,5 +95,6 @@ body.addEventListener('click', (e) => {
     updateLikes(e.target)
   }
 });
+
 renderItemsComments();
 postNewComments()
