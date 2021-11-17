@@ -1,35 +1,22 @@
 import axios from 'axios';
+import itemsCounter from './counter';
+import { getMovies, GetLikes } from './requests';
 
 const div = document.querySelector('.movies');
 const comments = document.querySelector('.comments');
+const header = document.querySelector('.title');
 const body = document.querySelector('body');
 let movies = [];
 let commentHTML = '';
 
-const getMovies = async () => {
- const result = await axios.get('https://api.tvmaze.com/shows');
- movies = result.data;
- movies = movies.slice(0,6);
- return movies;
-};
-
-const updateLikes = async (ele) => {
-  console.log(ele);
-  await axios.post(`https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/likes`,{ item_id: ele.id});
-  displayMovie();
-}
-
-const GetLikes = async () => { 
-  const res = await axios.get(`https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/likes/`);
-  return res.data;
-}
-
-const displayMovie = async() => {
- const movies = await getMovies();
-  const likes =await GetLikes();
+const displayMovie = async () => {
+  movies = await getMovies();
+  const likes = await GetLikes();
+  const counter = itemsCounter(movies);
+  header.innerHTML += ` (${counter})`;
   div.innerHTML = '';
   movies.forEach((movie, index) => {
-    let likeVal = likes[index] !== undefined ? likes[index].likes : 0;
+    const likeVal = likes[index] !== undefined ? likes[index].likes : 0;
     div.innerHTML += `
     <div id="${movie.id}">
     <img src="${movie.image.medium}" alt="${movie.name}">
@@ -40,42 +27,44 @@ const displayMovie = async() => {
     </div>
     <button class="comment-button">Comment</button>
     </div>`;
+  });
+};
 
-  })
-}
+const updateLikes = async (ele) => {
+  await axios.post('https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/likes', { item_id: ele.id });
+  displayMovie();
+};
 
-displayMovie();
-
-const postNewComments = (movieID='movie1', userName='Orcun', userComment='Trying') => {
-  axios.post(`https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/comments`, {
+const postNewComments = (movieID = 'movie1', userName = 'Orcun', userComment = 'Trying') => {
+  axios.post('https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/comments', {
     item_id: movieID,
     username: userName,
-    comment: userComment
-  })
-}
+    comment: userComment,
+  });
+};
+
+const getComments = async (movieId) => {
+  const comments = await axios.get(`https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/comments?item_id=${movieId}`);
+  return comments.data;
+};
 
 const renderItemsComments = async () => {
   const getCommentsFromAPI = await getComments('movie1');
-  getCommentsFromAPI.forEach((i) => {commentHTML += `<p>${i.creation_date} ${i.username}: ${i.comment}</p>`})
-  console.log(commentHTML);
-}
-
-const getComments = async (movieId) => {
-  const comments = await axios.get(`https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/comments?item_id=${movieId}`)
-  return comments.data;
-}
+  getCommentsFromAPI.forEach((i) => { commentHTML += `<p>${i.creation_date} ${i.username}: ${i.comment}</p>`; });
+  // console.log(commentHTML);
+};
 
 body.addEventListener('click', (e) => {
   if (e.target.className === 'comment-button') {
     comments.innerHTML = `
     <div id='pop'>
-      <img src="${movies[parseInt(e.target.parentNode.id) - 1].image.medium}" alt="${movies[parseInt(e.target.parentNode.id) - 1].name}">
-      <h1>${movies[parseInt(e.target.parentNode.id) - 1].name}</h1>
+      <img src="${movies[parseInt(e.target.parentNode.id, 10) - 1].image.medium}" alt="${movies[parseInt(e.target.parentNode.id, 10) - 1].name}">
+      <h1>${movies[parseInt(e.target.parentNode.id, 10) - 1].name}</h1>
       <div id='comment-feature'>
-        <p> Rating: ${movies[parseInt(e.target.parentNode.id) - 1].rating.average}</p>
-        <p> Released Date: ${movies[parseInt(e.target.parentNode.id) - 1].premiered}</p>
-        <p> Genres: ${movies[parseInt(e.target.parentNode.id) - 1].genres}</p>
-        <p> Language: ${movies[parseInt(e.target.parentNode.id) - 1].language}</p>
+        <p> Rating: ${movies[parseInt(e.target.parentNode.id, 10) - 1].rating.average}</p>
+        <p> Released Date: ${movies[parseInt(e.target.parentNode.id, 10) - 1].premiered}</p>
+        <p> Genres: ${movies[parseInt(e.target.parentNode.id, 10) - 1].genres}</p>
+        <p> Language: ${movies[parseInt(e.target.parentNode.id, 10) - 1].language}</p>
       </div>
       <div id='comment-area'>
         <h2>Comments</h2>
@@ -90,11 +79,12 @@ body.addEventListener('click', (e) => {
         </form>
       </div>
     </div>`;
-  }
-  else if (e.target.classList.contains('fa-heart')) {
-    updateLikes(e.target)
+  } else if (e.target.classList.contains('fa-heart')) {
+    updateLikes(e.target);
+    displayMovie();
   }
 });
 
+displayMovie();
 renderItemsComments();
-postNewComments()
+postNewComments();
