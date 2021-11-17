@@ -51,6 +51,7 @@ const postNewComments = async (movieID, userName, userComment) => {
     "username": userName,
     "comment": userComment
   });
+  showComments(movieID);
 }
 
 const getComments = async (movieId) => {
@@ -87,6 +88,7 @@ const showComments = async (id) => {
 const popUpHtml = (target) => {
   comments.innerHTML = `
     <div id='pop'>
+      <i class='fa fa-time'></i>
       <img src="${movies[parseInt(target) - 1].image.medium}" alt="${movies[parseInt(target) - 1].name}">
       <h1>${movies[parseInt(target) - 1].name}</h1>
       <div id='comment-feature'>
@@ -102,7 +104,6 @@ body.addEventListener('click', (e) => {
   let indexID = e.target.parentNode.id 
   if (e.target.className === 'comment-button') {
     popUpHtml(indexID);
-    comments.innerHTML = '';
     commentHTML = '';
     showComments(indexID);
   }
@@ -115,7 +116,6 @@ body.addEventListener('click', (e) => {
     commentHTML = '';
     comments.innerHTML = '';
     popUpHtml(e.target.name);
-    showComments(e.target.name);
     postNewComments(sentID,sentUserName,sentUserComment);
   }
 });
