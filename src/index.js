@@ -65,6 +65,22 @@ const getComments = async (movieId) => {
   return comments.data;
 }
 
+const showComments = () => {
+  comments.innerHTML +=
+  `<div id='comment-area'>
+        <h2>Comments</h2>
+        ${commentHTML}
+      </div>
+      <div id='comment-form'>
+        <h2>Add a Comment</h2>
+        <form action="submit" id="form-area">
+          <input type="text" id="name" placeholder="Your Name">
+          <textarea type="textarea" rows="4" cols="50" name="comment">Your Insights</textarea>
+          <button id="form-submit" type="button">Submit Comment</button>
+        </form>
+      </div>`;
+}
+
 body.addEventListener('click', (e) => {
   if (e.target.className === 'comment-button') {
     comments.innerHTML = `
@@ -77,24 +93,10 @@ body.addEventListener('click', (e) => {
         <p> Genres: ${movies[parseInt(e.target.parentNode.id) - 1].genres}</p>
         <p> Language: ${movies[parseInt(e.target.parentNode.id) - 1].language}</p>
       </div>
-      <div id='comment-area'>
-        <h2>Comments</h2>
-        ${commentHTML}
-      </div>
-      <div id='comment-form'>
-        <h2>Add a Comment</h2>
-        <form action="submit" id="form-area">
-          <input type="text" id="name" placeholder="Your Name">
-          <textarea type="textarea" rows="4" cols="50" name="comment">Your Insights</textarea>
-          <button id="form-submit" type="button">Submit Comment</button>
-        </form>
-      </div>
     </div>`;
+    showComments();
   }
   else if (e.target.classList.contains('fa-heart')) {
     updateLikes(e.target)
   }
 });
-
-renderItemsComments();
-postNewComments()
