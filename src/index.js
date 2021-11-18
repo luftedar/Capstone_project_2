@@ -1,11 +1,13 @@
 import axios from 'axios';
 import itemsCounter from './counter';
 import { getMovies, GetLikes } from './requests';
+import './style.css';
 
 const div = document.querySelector('.movies');
 const comments = document.querySelector('.comments');
 const header = document.querySelector('.shows');
 const body = document.querySelector('body');
+const commentsDiv = document.querySelector('#comments-wrapper');
 let movies = [];
 let commentHTML = '';
 let getCommentsFromAPI = [];
@@ -40,13 +42,15 @@ const updateLikes = async (ele) => {
 const popUpHtml = (target) => {
   comments.innerHTML = `
     <div id='pop'>
-      <i class='fas fa-times'></i>
-      <img src="${movies[parseInt(target, 10) - 1].image.medium}" alt="${movies[parseInt(target, 10) - 1].name}">
-      <h1>${movies[parseInt(target, 10) - 1].name}</h1>
+      <div id='img-div'>
+        <i class='fas fa-times'></i>
+        <img src="${movies[parseInt(target, 10) - 1].image.medium}" alt="${movies[parseInt(target, 10) - 1].name}">
+      </div>
+      <h2>${movies[parseInt(target, 10) - 1].name}</h2>
       <div id='comment-feature'>
         <p> Rating: ${movies[parseInt(target, 10) - 1].rating.average}</p>
-        <p> Released Date: ${movies[parseInt(target, 10) - 1].premiered}</p>
         <p> Genres: ${movies[parseInt(target, 10) - 1].genres}</p>
+        <p> Released Date: ${movies[parseInt(target, 10) - 1].premiered}</p>
         <p> Language: ${movies[parseInt(target, 10) - 1].language}</p>
       </div>
     </div>`;
@@ -103,6 +107,7 @@ body.addEventListener('click', (e) => {
     popUpHtml(indexID);
     commentHTML = '';
     showComments(indexID);
+    commentsDiv.classList.remove('d-none')
   } else if (e.target.classList.contains('fa-heart')) {
     updateLikes(e.target);
     displayMovie();
@@ -116,7 +121,7 @@ body.addEventListener('click', (e) => {
     postNewComments(sentID, sentUserName, sentUserComment);
   } else if (e.target.classList.contains('fa-times')) {
     comments.innerHTML = '';
-    displayMovie();
+    commentsDiv.classList.add('d-none')
   }
 });
 
