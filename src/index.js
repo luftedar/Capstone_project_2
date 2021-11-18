@@ -28,7 +28,7 @@ const displayMovie = async () => {
     <div class="movie" id="${movie.id}">
     <img src="${movie.image.medium}" alt="${movie.name}">
     <div class="likes">
-    <p>${movie.name}</p>
+    <p class="like-p">${movie.name}</p>
     <button class="like-button"><i class="far fa-heart fa-2x" id='heart-${movie.id}'></i></button>
     </div>
     <p>${likeVal} likes</p>
