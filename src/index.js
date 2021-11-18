@@ -1,32 +1,21 @@
 import axios from 'axios';
+import itemsCounter from './counter';
+import { getMovies, GetLikes } from './requests';
 
 const div = document.querySelector('.movies');
 const comments = document.querySelector('.comments');
+const header = document.querySelector('.shows');
 const body = document.querySelector('body');
 let movies = [];
 let commentHTML = '';
 let getCommentsFromAPI = [];
 
-const getMovies = async () => {
-  const result = await axios.get('https://api.tvmaze.com/shows');
-  movies = result.data;
-  movies = movies.slice(0, 6);
-  return movies;
-};
-
-const updateLikes = async (ele) => {
-  await axios.post('https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/likes', { item_id: ele.id });
-  displayMovie();
-};
-
-const GetLikes = async () => {
-  const res = await axios.get('https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/likes/');
-  return res.data;
-};
-
 const displayMovie = async () => {
-  const movies = await getMovies();
+  movies = await getMovies();
   const likes = await GetLikes();
+  const counter = itemsCounter(movies);
+  header.innerHTML += ` (${counter})`;
+
   div.innerHTML = '';
   movies.forEach((movie, index) => {
     const likeVal = likes[index] !== undefined ? likes[index].likes : 0;
@@ -43,10 +32,13 @@ const displayMovie = async () => {
   });
 };
 
-displayMovie();
+const updateLikes = async (ele) => {
+  await axios.post('https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/likes', { item_id: ele.id });
+  displayMovie();
+};
 
-const postNewComments = async (movieID, userName, userComment) => {
-  await axios.post('https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/comments', {
+const postNewComments = (movieID, userName, userComment) => {
+  axios.post('https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/comments', {
     item_id: movieID,
     username: userName,
     comment: userComment,
@@ -112,6 +104,7 @@ body.addEventListener('click', (e) => {
     showComments(indexID);
   } else if (e.target.classList.contains('fa-heart')) {
     updateLikes(e.target);
+    displayMovie();
   } else if (e.target.innerHTML === 'Submit Comment') {
     const sentID = (e.target.name).toString();
     const sentUserName = (e.target.parentNode.childNodes[1].value);
@@ -125,3 +118,6 @@ body.addEventListener('click', (e) => {
     displayMovie();
   }
 });
+});
+
+displayMovie();
