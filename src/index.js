@@ -50,7 +50,7 @@ const getComments = async (movieId) => {
   try {
     const comments = await axios.get(`https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/comments?item_id=${movieId}`);
     return comments.data;
-  }catch{
+  } catch {
     return [];
   }
 };
@@ -75,7 +75,7 @@ const showComments = async (id) => {
         <h2>Add a Comment</h2>
         <form action="submit" id="form-area">
           <input type="text" id="name" placeholder="Your Name">
-          <textarea type="textarea" rows="4" cols="50" name="comment">Your Insights</textarea>
+          <textarea type="textarea" rows="4" cols="50" name="comment" placeholder="Your Insights"></textarea>
           <button name="${id}" type="button">Submit Comment</button>
         </form>
       </div>`;
@@ -117,7 +117,6 @@ body.addEventListener('click', (e) => {
     comments.innerHTML = '';
     displayMovie();
   }
-});
 });
 
 displayMovie();
