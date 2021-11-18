@@ -55,8 +55,12 @@ const postNewComments = async (movieID, userName, userComment) => {
 };
 
 const getComments = async (movieId) => {
-  const comments = await axios.get(`https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/comments?item_id=${movieId}`);
-  return comments.data;
+  try {
+    const comments = await axios.get(`https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/XMHWey4za3iNnBFD5KUq/comments?item_id=${movieId}`);
+    return comments.data;
+  }catch{
+    return [];
+  }
 };
 
 const showComments = async (id) => {
