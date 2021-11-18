@@ -4,7 +4,7 @@ import { getMovies, GetLikes } from './requests';
 
 const div = document.querySelector('.movies');
 const comments = document.querySelector('.comments');
-const header = document.querySelector('.title');
+const header = document.querySelector('.shows');
 const body = document.querySelector('body');
 let movies = [];
 let commentHTML = '';
