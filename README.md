@@ -15,7 +15,7 @@
 
 ## Live Demo
 
-[Live Demo Link](https://livedemo.com)
+[Live Demo Link](https://wes-isaac.github.io/Capstone_project_2/)
 
 
 ## Getting Started
