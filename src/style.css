@@ -238,3 +238,13 @@ footer {
   margin-top: 55px;
   background: #c1c7d0b9;
 }
+
+@media screen and (max-width: 600px) {
+  .movies {
+    display: grid;
+    width: 70%;
+    margin: auto;
+    grid-template-columns: 1fr;
+    grid-gap: 15px;
+  }
+}
