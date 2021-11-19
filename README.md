@@ -4,6 +4,8 @@
 
 > In this project, we build a site using the TVmazAPI. It displays information about tv shows and we also used an involvement api to interact and update every movie. The interactions we have implemented are giving likes and comments. After every interaction the page is updated.
 
+> Here is a little preview of the app with the creators [preview](https://drive.google.com/file/d/1eN6UrF6mOuyHjrpnmfRoFWFGzjdlGSTP/view?usp=sharing).
+
 ![screenshot](./app_screenshot.png)
 
 
