@@ -2,7 +2,7 @@
 
 # Shows
 
-> The project that made with API calls by using Webpack.
+> In this project, we build a site using the TVmazAPI. It displays information about tv shows and we also used an involvement api to interact and update every movie. The interactions we have implemented are giving likes and comments. After every interaction the page is updated.
 
 ![screenshot](./app_screenshot.png)
 
