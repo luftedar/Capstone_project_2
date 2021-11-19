@@ -2,7 +2,9 @@ import axios from 'axios';
 import itemsCounter from './counter';
 import { getMovies, GetLikes } from './requests';
 import './style.css';
+import './contact';
 
+const main = document.querySelector('main');
 const div = document.querySelector('.movies');
 const comments = document.querySelector('.comments');
 const header = document.querySelector('.shows');
@@ -16,19 +18,20 @@ const displayMovie = async () => {
   movies = await getMovies();
   const likes = await GetLikes();
   const counter = itemsCounter(movies);
+  header.innerHTML = 'Shows';
   header.innerHTML += ` (${counter})`;
 
   div.innerHTML = '';
   movies.forEach((movie, index) => {
     const likeVal = likes[index] !== undefined ? likes[index].likes : 0;
     div.innerHTML += `
-    <div id="${movie.id}">
+    <div class="movie" id="${movie.id}">
     <img src="${movie.image.medium}" alt="${movie.name}">
-    <p>${movie.name}</p>
-    <div>
-    <button><i class="far fa-heart" id='heart-${movie.id}'></i></button>
-    <p>${likeVal} likes</p>
+    <div class="likes">
+    <p class="like-p">${movie.name}</p>
+    <button class="like-button"><i class="far fa-heart fa-2x" id='heart-${movie.id}'></i></button>
     </div>
+    <p>${likeVal} likes</p>
     <button class="comment-button">Comment</button>
     </div>`;
   });
@@ -76,8 +79,9 @@ const showComments = async (id) => {
       <div id='comment-form'>
         <h2>Add a Comment</h2>
         <form action="submit" id="form-area">
-          <input type="text" id="name" placeholder="Your Name">
-          <textarea type="textarea" rows="4" cols="50" name="comment" placeholder="Your Insights"></textarea>
+          <input type="text" id="name" placeholder="Your Name" required>
+          <textarea type="textarea" rows="4" cols="50" name="comment" placeholder="Your Insights" required></textarea>
+          <p></p>
           <button name="${id}" type="button">Submit Comment</button>
         </form>
       </div>`;
@@ -101,9 +105,23 @@ const getComments = async (movieId) => {
   }
 };
 
+const links = document.querySelectorAll('nav li a');
+  const resetLinks = () => {
+    console.log(links);
+    for (let i = 0; i < links.length; i += 1) {
+      links[i].classList.remove('active');
+    }
+  };
+
 body.addEventListener('click', (e) => {
   const indexID = e.target.parentNode.id;
-  if (e.target.className === 'comment-button') {
+  if (e.target.classList.contains('shows')) {
+    resetLinks();
+    e.target.classList.add('active');
+    main.innerHTML='';
+    main.append(div);
+  }else if (e.target.className === 'comment-button') {
+    body.classList.add('fixed');
     popUpHtml(indexID);
     commentHTML = '';
     showComments(indexID);
@@ -111,17 +129,28 @@ body.addEventListener('click', (e) => {
   } else if (e.target.classList.contains('fa-heart')) {
     updateLikes(e.target);
     displayMovie();
+    e.target.classList.add('heart');
   } else if (e.target.innerHTML === 'Submit Comment') {
     const sentID = (e.target.name).toString();
     const sentUserName = (e.target.parentNode.childNodes[1].value);
     const sentUserComment = (e.target.parentNode.childNodes[3].value);
-    commentHTML = '';
-    comments.innerHTML = '';
-    popUpHtml(e.target.name);
-    postNewComments(sentID, sentUserName, sentUserComment);
+    if (sentUserComment && sentUserName) {
+      commentHTML = '';
+      comments.innerHTML = '';
+      popUpHtml(e.target.name);
+      postNewComments(sentID, sentUserName, sentUserComment);
+    } else {
+      const p = e.target.previousElementSibling;
+      p.innerText = 'Please insert your name and comment.';
+  
+    }
   } else if (e.target.classList.contains('fa-times')) {
     comments.innerHTML = '';
-    commentsDiv.classList.add('d-none')
+    commentsDiv.classList.add('d-none');
+    body.classList.remove('fixed');
+  } else if (e.target.classList.contains('link')) {
+    resetLinks();
+    e.target.classList.add('active');
   }
 });
 
